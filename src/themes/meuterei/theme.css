@@ -1,0 +1,8 @@
+[data-theme='meuterei'] .btn-primary {
+  background: linear-gradient(180deg, #f5d896, #d6a854 55%, #b4843a);
+  box-shadow: inset 0 0 0 2px rgba(35, 21, 7, 0.4), 0 8px 24px rgba(0, 0, 0, 0.45);
+  font-family: var(--font-display);
+  font-size: 1.35rem;
+  letter-spacing: 0.04em;
+}
+[data-theme='meuterei'] .display { letter-spacing: 0.03em; }

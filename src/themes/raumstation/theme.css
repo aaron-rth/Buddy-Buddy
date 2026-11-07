@@ -1,0 +1,19 @@
+[data-theme='raumstation'] .btn,
+[data-theme='raumstation'] .panel {
+  clip-path: polygon(12px 0, 100% 0, 100% calc(100% - 12px), calc(100% - 12px) 100%, 0 100%, 0 12px);
+}
+[data-theme='raumstation'] .btn-primary {
+  background: linear-gradient(90deg, #3ce0ff, #7af0ff);
+  box-shadow: 0 0 24px rgba(60, 224, 255, 0.5);
+  text-transform: uppercase;
+  letter-spacing: 0.14em;
+}
+[data-theme='raumstation'] .display { text-transform: uppercase; letter-spacing: 0.08em; }
+[data-theme='raumstation'] body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(0deg, rgba(255, 255, 255, 0.025) 0 1px, transparent 1px 3px);
+  z-index: 50;
+}

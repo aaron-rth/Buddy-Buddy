@@ -1,0 +1,5 @@
+[data-theme='spukhaus'] .btn-primary {
+  background: linear-gradient(180deg, #c8ffd2, #8be39c);
+  box-shadow: 0 0 30px rgba(166, 243, 181, 0.35);
+}
+[data-theme='spukhaus'] .display { letter-spacing: 0.05em; }

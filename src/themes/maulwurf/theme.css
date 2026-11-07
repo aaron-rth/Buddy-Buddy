@@ -1,0 +1,7 @@
+[data-theme='maulwurf'] .btn-primary {
+  background: #ece5d0;
+  box-shadow: 4px 4px 0 #d63a2f;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+[data-theme='maulwurf'] .display { text-transform: uppercase; letter-spacing: 0.04em; }
