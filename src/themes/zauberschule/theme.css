@@ -1,0 +1,5 @@
+[data-theme='zauberschule'] .btn-primary {
+  background: linear-gradient(180deg, #ffe39e, #f2c86b 50%, #d79c3c);
+  box-shadow: 0 0 30px rgba(167, 123, 255, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
+}
+[data-theme='zauberschule'] .panel { box-shadow: 0 0 40px rgba(167, 123, 255, 0.12); }
