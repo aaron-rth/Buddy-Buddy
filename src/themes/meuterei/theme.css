@@ -6,3 +6,4 @@
   letter-spacing: 0.04em;
 }
 [data-theme='meuterei'] .display { letter-spacing: 0.03em; }
+[data-theme='meuterei'] { --emblem-clip: polygon(30% 0, 70% 0, 100% 30%, 100% 70%, 70% 100%, 30% 100%, 0 70%, 0 30%); --emblem-radius: 0; }

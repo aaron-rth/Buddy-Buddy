@@ -23,4 +23,5 @@ npm run build    # statischer Build nach dist/
 ## Erweitern
 
 - **Neues Theme:** Ordner in `src/themes/<id>/` mit `index.ts` (Konfiguration), `Scene.svelte` (Hintergrund), `theme.css` (optionale Stil-Details) und in `src/themes/index.ts` eintragen.
-- **Neue Rolle:** Eintrag in `src/core/roles.ts`, optional Theme-Namen unter `roles` im jeweiligen Theme.
+- **Neue Rolle:** Eintrag in `src/core/roles.ts`, optional Theme-Namen und Icons unter `roles` im jeweiligen Theme.
+- **Neues Icon:** Eintrag in `src/ui/icons/icons.ts` (24×24, Linienstil), danach per Name in Themes und Rollen nutzbar.

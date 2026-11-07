@@ -7,8 +7,19 @@
   import type { RevealInfo } from '../../core/types';
   import type { Theme } from '../../themes/types';
   import type { ThemedRole } from '../../lib/text';
+  import Icon from '../icons/Icon.svelte';
+  import Emblem from '../icons/Emblem.svelte';
 
-  let { role, info, theme, onseen }: { role: ThemedRole; info?: RevealInfo; theme: Theme; onseen: () => void } = $props();
+  let {
+    role,
+    info,
+    lover,
+    theme,
+    onseen,
+  }: { role: ThemedRole; info?: RevealInfo; lover?: { partner: string; mixed: boolean }; theme: Theme; onseen: () => void } = $props();
+
+  const loverLine = $derived(lover ? theme.lovers.line.split('{name}') : []);
+  const dense = $derived(!!info && !!lover);
 
   let pressed = $state(false);
   let seenTimer: ReturnType<typeof setTimeout> | undefined;
@@ -80,9 +91,9 @@
   <!-- Inhalt: wird nur gerendert, solange gedrückt -->
   <div class="face front">
     {#if pressed}
-      <div class="content">
+      <div class="content" class:dense>
         <span class="you label">Du bist</span>
-        <span class="icon">{role.icon}</span>
+        <Emblem icon={role.icon} size={dense ? "md" : "lg"} />
         <span class="name display" style="--len:{Math.max(6, role.name.length)}">{shownName}</span>
         {#if role.short}<p class="short">{role.short}</p>{/if}
         {#if info}
@@ -98,7 +109,20 @@
             {/if}
           </p>
         {/if}
-        <p class="goal">{role.goal}</p>
+        {#if lover}
+          <div class="lover">
+            <p class="lover-line"><Icon name={theme.lovers.icon} size={18} /> <span>{loverLine[0]}<b>{lover.partner}</b>{loverLine[1] ?? ''}</span></p>
+            <p class="lover-rule">
+              {#if lover.mixed}
+                Verbotenes Paar: {lover.partner} spielt für die andere Seite. Ihr gewinnt nur zu zweit – als Letzte übrig.
+              {:else}
+                Ihr seid beide auf derselben Seite. Überlebt ihr beide: Bonus-Sieg.
+              {/if}
+              Stirbt einer, stirbt der andere mit.
+            </p>
+          </div>
+        {/if}
+        <p class="goal">{lover?.mixed ? 'Gewinnt zu zweit.' : role.goal}</p>
       </div>
     {/if}
   </div>
@@ -106,19 +130,19 @@
   <!-- Abdeckung -->
   <div class="face cover" aria-hidden="true">
     <div class="pattern"></div>
-    <div class="emblem">
+    <div class="mark">
       {#if theme.reveal === 'terminal'}
         <span class="term">&gt; VERSCHLÜSSELT<span class="cursor">_</span></span>
       {:else if theme.reveal === 'dossier'}
         <span class="stamp">Streng geheim</span>
       {:else if theme.reveal === 'envelope'}
-        <span class="seal">✦</span>
+        <span class="seal"><Icon name="star" size={34} /></span>
       {:else}
         <span class="glyph">?</span>
       {/if}
     </div>
     <p class="cover-text">{theme.terms.cover}</p>
-    <span class="finger">☝︎</span>
+    <span class="finger"><Icon name="hold" size={30} /></span>
   </div>
 </div>
 
@@ -159,9 +183,22 @@
     padding: 22px;
     text-align: center;
   }
-  .icon { font-size: 3.4rem; line-height: 1; margin: 6px 0; }
+  .content :global(.emblem) { margin: 4px 0; }
+  .content { overflow: hidden; }
+  .lover {
+    width: 100%;
+    padding: 8px 12px;
+    border-radius: var(--radius);
+    border: 1px solid color-mix(in srgb, currentColor 22%, transparent);
+    font-size: 0.88rem;
+  }
+  .lover-line { display: flex; align-items: center; justify-content: center; gap: 6px; font-size: 0.98rem; }
+  .lover-rule { opacity: 0.8; margin-top: 2px; font-size: 0.8rem; }
+  .dense { gap: 6px; padding: 16px; }
+  .dense .short, .dense .info { font-size: 0.84rem; }
+  .dense .name { font-size: clamp(1.1rem, calc(var(--name-k, 15rem) * 0.8 / var(--len)), 2.3rem); }
   .name {
-    font-size: clamp(1.5rem, calc(15rem / var(--len)), 3rem);
+    font-size: clamp(1.2rem, calc(var(--name-k, 15rem) / var(--len)), 3rem);
     word-break: break-word;
     hyphens: auto;
   }
@@ -196,7 +233,7 @@
       repeating-linear-gradient(45deg, color-mix(in srgb, var(--primary) 7%, transparent) 0 2px, transparent 2px 14px),
       repeating-linear-gradient(-45deg, color-mix(in srgb, var(--primary) 7%, transparent) 0 2px, transparent 2px 14px);
   }
-  .emblem { position: relative; }
+  .mark { position: relative; }
   .glyph {
     display: grid;
     place-items: center;
@@ -210,7 +247,7 @@
     box-shadow: 0 0 40px color-mix(in srgb, var(--primary) 35%, transparent);
   }
   .cover-text { position: relative; font-weight: 600; max-width: 220px; }
-  .finger { position: relative; font-size: 1.8rem; animation: press 1.6s ease-in-out infinite; }
+  .finger { position: relative; display: grid; color: var(--primary); animation: press 1.6s ease-in-out infinite; }
   @keyframes press { 50% { transform: translateY(6px) scale(0.92); } }
 
   /* ---- Karte (Flip) ---- */
@@ -220,7 +257,7 @@
   .style-card.pressed .cover { transform: rotateY(-180deg); }
 
   /* ---- Umschlag ---- */
-  .style-envelope .front { background: linear-gradient(170deg, #f8efd9, #e6d5ad); color: #2a1d0f; }
+  .style-envelope .front { background: linear-gradient(170deg, #f8efd9, #e6d5ad); color: #2a1d0f; --primary: #7d1a1d; }
   .style-envelope .cover {
     background:
       linear-gradient(to bottom right, transparent 49.6%, rgba(0, 0, 0, 0.25) 50%, transparent 50.6%) top / 100% 45% no-repeat,
@@ -258,6 +295,7 @@
   .style-scroll .front {
     background: radial-gradient(ellipse at center, #f5e6c4, #dcc28e 85%);
     color: #2c1c0a;
+    --primary: #6b4416;
     clip-path: inset(46% 0 46% 0 round 12px);
   }
   .style-scroll.pressed .front { clip-path: inset(0 0 0 0 round 12px); }
@@ -268,7 +306,7 @@
   .style-scroll.pressed .cover { opacity: 0; transform: scaleY(0.1); }
 
   /* ---- Akte ---- */
-  .style-dossier .front { background: #efe9d8; color: #1b1b1b; font-family: var(--font-display); }
+  .style-dossier .front { background: #efe9d8; color: #1b1b1b; font-family: var(--font-display); --primary: #1b1b1b; }
   .style-dossier .front::after {
     content: 'VERTRAULICH';
     position: absolute;

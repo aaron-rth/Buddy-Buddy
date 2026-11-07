@@ -66,13 +66,25 @@ export interface GameConfig {
   impostersKnow: boolean;
   noDoubleKill: boolean;
   revealOnVoteOut: boolean;
-  emergencyMeeting: boolean;
+  /** Notfall-Versammlungen pro Spiel (insgesamt, nicht pro Spieler) */
+  emergencyMeetings: number;
   discussionMinutes: number;
+  lovers: LoversSetting;
   /** 'range' = nur Spanne verraten (z. B. 2–3) */
   countDisplay: 'exact' | 'range';
   /** blockierte (überschreibbare) Konfiguration trotzdem erlauben */
   override: boolean;
 }
+
+export interface LoversSetting {
+  enabled: boolean;
+  /** 1 = sicher, sonst Wahrscheinlichkeit, dass es ein Paar gibt */
+  chance: number;
+  /** true = kann jeden treffen (auch böse), false = nur gute Spieler */
+  anyone: boolean;
+}
+
+export type Winner = 'crew' | 'imposter' | 'jester' | 'lovers';
 
 export type RevealInfo =
   | { type: 'teammates'; names: string[] }
@@ -86,6 +98,20 @@ export interface Assignment {
   roleId: string;
   seen: boolean;
   info?: RevealInfo;
+  /** Verliebtes Paar: Name des Partners; mixed = Partner ist im anderen Team */
+  lover?: { partner: string; mixed: boolean };
+}
+
+export interface Group {
+  id: string;
+  name: string;
+  players: string[];
+}
+
+export interface PlayerStats {
+  games: number;
+  wins: number;
+  imposter: number;
 }
 
 export interface Game {
@@ -94,4 +120,6 @@ export interface Game {
   assignments: Assignment[];
   /** Momentaufnahme der Regeln bei der Verteilung */
   config: GameConfig;
+  /** Ergebnis, sobald in der Auflösung eingetragen */
+  winner?: Winner;
 }

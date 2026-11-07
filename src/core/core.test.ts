@@ -109,3 +109,36 @@ describe('Verteilung', () => {
     expect(distribute(c).assignments.filter((a) => a.roleId === 'c1')).toHaveLength(1);
   });
 });
+
+describe('Verliebte', () => {
+  it('genau zwei, gegenseitig, nie der Narr', () => {
+    const c = cfg(12, (c) => { c.lovers = { enabled: true, chance: 1, anyone: true }; set(c, 'jester', 1); });
+    let mixed = 0;
+    for (let i = 0; i < 2000; i++) {
+      const g = distribute(c);
+      const l = g.assignments.filter((a) => a.lover);
+      expect(l).toHaveLength(2);
+      expect(l[0].lover!.partner).toBe(l[1].name);
+      expect(l[1].lover!.partner).toBe(l[0].name);
+      expect(l.some((a) => a.roleId === 'jester')).toBe(false);
+      if (l[0].lover!.mixed) mixed++;
+    }
+    expect(mixed).toBeGreaterThan(0);
+  });
+  it('nur gute Spieler (Option)', () => {
+    const c = cfg(12, (c) => { c.lovers = { enabled: true, chance: 1, anyone: false }; set(c, 'accomplice', 1); });
+    for (let i = 0; i < 1000; i++) {
+      const l = distribute(c).assignments.filter((a) => a.lover);
+      expect(l).toHaveLength(2);
+      for (const a of l) expect(['crew', 'sheriff', 'detective']).toContain(a.roleId);
+      expect(l[0].lover!.mixed).toBe(false);
+    }
+  });
+  it('Wahrscheinlichkeit', () => {
+    const c = cfg(12, (c) => { c.lovers = { enabled: true, chance: 0.5, anyone: true }; });
+    let hits = 0;
+    for (let i = 0; i < 4000; i++) if (distribute(c).assignments.some((a) => a.lover)) hits++;
+    expect(hits / 4000).toBeGreaterThan(0.46);
+    expect(hits / 4000).toBeLessThan(0.54);
+  });
+});

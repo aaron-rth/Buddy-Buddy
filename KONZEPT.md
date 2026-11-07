@@ -21,7 +21,7 @@ Start → ① Welt (Theme) → ② Spieler → ③ Regeln → Rollen verteilen
 | **Kill-Cooldown** | Standard 45 s pro Imposter. Er startet zu Beginn jeder Nacht neu, damit sich alle erst verteilen können. |
 | **Leichenfund** | „Buddy Buddy!“ rufen → Licht an → Versammlung |
 | **Versammlung** | 3 min diskutieren. Auf drei zeigen alle gleichzeitig auf eine Person oder auf den Boden (Enthaltung). Mehrheit fliegt raus, bei Gleichstand niemand. |
-| **Notfall-Versammlung** | Jeder darf 1× pro Spiel eine Versammlung einberufen (Option). |
+| **Notfall-Versammlung** | Insgesamt 0–3× pro Spiel (Standard 1), nicht pro Spieler. Eigener Ruf je Theme, z. B. „Zur Glocke!“, „Code Rot!“. |
 | **Sieg Crew** | Alle Imposter sind entlarvt. |
 | **Sieg Imposter** | Die Imposter sind so viele wie alle anderen zusammen. |
 | **Sicherheit** | Nur Schulter oder Oberarm antippen, nicht rennen, „Stopp, Licht an!“ beendet sofort alles. |
@@ -72,7 +72,7 @@ Orientierung ist Among Us: mehrere Kills pro Runde, Standard 10 Spieler mit 2 Im
 |---|---|---|---|
 | Crew | gut | Imposter finden | – |
 | Imposter | böse | Kill durch 2× Antippen, Cooldown | – |
-| Sheriff | gut | 1× pro Spiel 3× antippen. Ist das Ziel Imposter, stirbt es, sonst stirbt der Sheriff. | 8 |
+| Sheriff | gut | 1× pro Spiel 4× antippen. Ist das Ziel Imposter, zählt es herunter und stirbt. Sonst flüstert das Ziel „falsch“, und der Sheriff stirbt (das Ziel lebt weiter). | 8 |
 | Ermittler | gut | Bekommt beim Aufdecken den Namen einer sicher unschuldigen Person. Im Spiel ist keine Aktion nötig. | 7 |
 | Komplize | böse | Kennt die Imposter, kann nicht töten | 10 |
 | Narr | neutral | Gewinnt allein, wenn er rausgewählt wird | 9 |
@@ -80,7 +80,29 @@ Orientierung ist Among Us: mehrere Kills pro Runde, Standard 10 Spieler mit 2 Im
 
 Alle Sonderrollen sind optional (Schalter). Jede Rolle kann „sicher“ oder mit 50 % / 25 % Wahrscheinlichkeit vorkommen.
 
-**Bewusst weggelassen:** Rollen, die einen Erzähler brauchen (Hexe, Seherin mit Aufwachen), Rollen, die Todeszeitpunkte synchronisieren müssen (Liebespaar, Jäger-Rache), Bekehrungen und Sabotage (Licht aus = Sicherheitsrisiko).
+### Verliebtes Paar
+
+Zusatz zur eigentlichen Rolle: Die App wählt zufällig zwei Spieler aus. Beide sehen auf ihrer Karte den Namen des Partners.
+
+- **Wen es treffen kann:** Standardmäßig jeden außer dem Narren. Mit der Option „Nur gute Spieler“ nur das gute Team.
+- **Wahrscheinlichkeit:** sicher, 50 % oder 25 %
+- **Verteilen:** Die beiden sollen sich im Haus verteilen und nicht ständig zusammen herumlaufen.
+- **Gemeinsamer Tod:** Wird einer nach „Buddy Buddy!“ tot gefunden oder rausgewählt, meldet sich der Partner und ist ebenfalls tot.
+  - Der Tod wird erst bei der Versammlung bekannt, deshalb braucht es im Dunkeln keine Synchronisation.
+- **Sieg:** Das Paar gewinnt mit seinem Team. Überleben beide, gibt es zusätzlich einen Bonus-Sieg.
+- **Verbotenes Paar:** Ist einer der beiden böse, gewinnen sie nur zu zweit, wenn sie als Letzte übrig sind.
+
+| Theme | Name |
+|---|---|
+| Mondnacht | Verliebte |
+| Das Dinner | Heimliche Affäre |
+| Raumstation | Neuro-Link |
+| Meuterei | Blutsbund |
+| Zauberschule | Seelenbund |
+| Maulwurf | Tandem |
+| Spukhaus | Seelenverwandte |
+
+**Bewusst weggelassen:** Rollen, die einen Erzähler brauchen (Hexe, Seherin mit Aufwachen), Rollen, die Todeszeitpunkte mitten in der Nacht synchronisieren müssen (Jäger-Rache), Bekehrungen und Sabotage (Licht aus = Sicherheitsrisiko).
 
 **Ideen für später:** Sanitäter (rettet ein Opfer während des Countdowns), Gepanzerter (überlebt den ersten Kill).
 
@@ -100,6 +122,10 @@ Jedes Theme legt Begriffe, Rollennamen, Icons, Farben, Schrift, Hintergrund-Szen
 
 **Ideen für später:** Ausbruch (Zombies), Verrat am Hof (Mittelalter), kinderfreundliches Theme, eigenes Theme mit frei wählbaren Begriffen.
 
+### Icons
+
+Eigenes SVG-Icon-Set im einheitlichen Linienstil, keine Emojis (`src/ui/icons/icons.ts`). Jedes Theme hat eigene Rollen-Icons, z. B. Wolfskopf, Dolch, Alien, Totenkopf-Flagge, Kapuze, Sonnenbrille oder Hörner. Sie stehen in einem Emblem, dessen Form zum Theme passt: Kreis, Raute, Sechseck oder Achteck. Das Emblem hat für alle Rollen dieselbe Farbe.
+
 ## 7. Geheime Rollenanzeige
 
 1. **Liste:** alle Namen als große Kacheln mit Fortschrittsanzeige („3 / 8“)
@@ -115,6 +141,7 @@ Schutzmaßnahmen:
 - Nochmal ansehen geht nur, indem man den eigenen Namen 1,5 s gedrückt hält, plus Warnung „Nur Aaron darf hinschauen!“.
 - Während der Verteilung bleibt der Bildschirm an (Wake Lock).
 - Wird die Seite neu geladen, geht es an derselben Stelle weiter, ohne neu zu mischen.
+- Wer seine Rolle gesehen hat, rutscht in der Liste nach unten. So stehen die Ungeöffneten immer oben.
 
 ## 8. Technik
 
@@ -133,17 +160,26 @@ src/
   ui/         Screens, Komponenten, Aufdeck-Karte
 ```
 
-## 9. Bewusst nicht eingebaut
+## 9. Extras
 
-- Live-Spielsteuerung (Timer, Kill-Erfassung): Das Handy bleibt während des Spiels in der Tasche.
+- **Gespeicherte Gruppen:** Spielerlisten unter einem Namen (z. B. „WG“) speichern und mit einem Tipp laden
+- **Statistik:** Nach der Auflösung wird eingetragen, wer gewonnen hat. Pro Name werden Spiele, Siege und die Zahl der Imposter-Runden gespeichert.
+- **Vorlesen:** Die Regelkarte wird per Sprachausgabe des Browsers vorgelesen.
+- **Sounds (standardmäßig aus):** Sie werden live per Web Audio erzeugt, ohne Dateien und lizenzfrei.
+  - Mysteriöser Startklang beim Verteilen, je Theme anders
+  - **„Nacht starten“:** 10 s leises Ticken zum Verteilen, dann ein tiefer Gong („Licht aus“). Danach läuft die Kill-Sperre als Countdown und endet mit einem leisen Glockenton. Der Bildschirm wird dabei schwarz.
+  - Beim Aufdecken gibt es bewusst keinen Ton.
+
+## 10. Bewusst nicht eingebaut
+
+- **„Fairer Zufall“:** Über mehrere Runden könnte man sonst ausschließen, wer wahrscheinlich kein Imposter ist. Der Zufall bleibt in jeder Runde komplett unabhängig.
+- Live-Spielsteuerung (Kill-Erfassung, Spielstand): Das Handy bleibt während des Spiels in der Tasche. Einzige Ausnahme ist der optionale „Nacht starten“-Countdown.
 - Abstimmung in der App: Mit dem Finger zeigen macht mehr Spaß.
 - Accounts, Online-Räume, Synchronisation zwischen Geräten
 - Rollen-Übersicht für den Spielleiter während des Spiels
 
-## 10. Ideen für später
+## 11. Ideen für später
 
-- „Fairer Zufall“: Wer zuletzt Imposter war, wird mit geringerer Wahrscheinlichkeit wieder Imposter.
-- Optionaler Nachtstart-Sound mit Countdown zum Verteilen
 - Rolle auf dem eigenen Handy ohne Server: QR-Code mit Spielerliste + Zufalls-Seed, jedes Handy berechnet daraus dieselbe Verteilung. Nur für Gruppen, die sich vertrauen.
 - Regel-Setup als Link teilen
 - Aufgaben-Modus als zweiter Siegweg für die Crew

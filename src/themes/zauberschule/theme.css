@@ -3,3 +3,4 @@
   box-shadow: 0 0 30px rgba(167, 123, 255, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.3) inset;
 }
 [data-theme='zauberschule'] .panel { box-shadow: 0 0 40px rgba(167, 123, 255, 0.12); }
+[data-theme='zauberschule'] { --emblem-radius: 50% 50% 46% 46% / 58% 58% 42% 42%; }

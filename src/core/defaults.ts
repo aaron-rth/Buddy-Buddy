@@ -47,8 +47,9 @@ export function defaultConfig(): GameConfig {
     impostersKnow: false,
     noDoubleKill: true,
     revealOnVoteOut: false,
-    emergencyMeeting: true,
+    emergencyMeetings: 1,
     discussionMinutes: 3,
+    lovers: { enabled: false, chance: 1, anyone: true },
     countDisplay: 'range',
     override: false,
   };
@@ -74,6 +75,9 @@ export function normalizeConfig(raw: Partial<GameConfig> | undefined): GameConfi
   for (const r of base.roles) if (!cfg.roles.some((x) => x.roleId === r.roleId)) cfg.roles.push(r);
   cfg.roles.sort((a, b) => (a.roleId === 'imposter' ? -1 : b.roleId === 'imposter' ? 1 : 0));
   cfg.players = Array.isArray(cfg.players) ? cfg.players : [];
+  cfg.lovers = { ...base.lovers, ...(cfg.lovers ?? {}) };
+  if (typeof cfg.emergencyMeetings !== 'number') cfg.emergencyMeetings = base.emergencyMeetings;
+  delete (cfg as unknown as Record<string, unknown>).emergencyMeeting;
   cfg.customRoles = Array.isArray(cfg.customRoles) ? cfg.customRoles : [];
   return cfg;
 }

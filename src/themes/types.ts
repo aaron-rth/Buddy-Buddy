@@ -24,13 +24,19 @@ export interface Theme {
     meeting: string;
     /** Ruf beim Leichenfund */
     call: string;
+    /** Ruf für eine Notfall-Versammlung */
+    emergencyCall: string;
     /** Story-Einstieg für die Regelkarte */
     intro: string;
     /** Text auf der verdeckten Karte */
     cover: string;
   };
-  /** Rollennamen/Icons je Rollen-ID (crew & imposter kommen aus terms) */
+  /** Rollennamen/Icons je Rollen-ID (crew & imposter kommen aus terms). icon = Name aus src/ui/icons */
   roles: Record<string, { name?: string; icon?: string }>;
+  /** Verliebtes Paar: Name, Icon, Satz auf der Karte ({name} = Partner) */
+  lovers: { name: string; icon: string; line: string };
+  /** Startklang (Web Audio): Grundton in Hz, Wellenform, Akkord in Halbtönen */
+  sound: { base: number; wave: OscillatorType; chord: number[] };
   palette: {
     bg: string;
     bg2: string;
