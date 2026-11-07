@@ -1,10 +1,18 @@
 <script lang="ts">
+  import Icon from '../icons/Icon.svelte';
+  import { store } from '../../lib/store.svelte';
+  import { chime } from '../../lib/sound';
   let { step = 0, onback }: { step?: number; onback?: () => void } = $props();
+
+  function toggleSound() {
+    store.prefs.sound = !store.prefs.sound;
+    if (store.prefs.sound) chime();
+  }
 </script>
 
 <header>
   {#if onback}
-    <button class="icon-btn" onclick={onback} aria-label="Zurück">←</button>
+    <button class="icon-btn" onclick={onback} aria-label="Zurück"><Icon name="back" /></button>
   {:else}
     <span class="spacer"></span>
   {/if}
@@ -15,7 +23,15 @@
       {/each}
     </div>
   {/if}
-  <span class="spacer"></span>
+  <button
+    class="icon-btn sound"
+    class:on={store.prefs.sound}
+    onclick={toggleSound}
+    aria-pressed={store.prefs.sound}
+    aria-label={store.prefs.sound ? 'Ton aus' : 'Ton an'}
+  >
+    <Icon name={store.prefs.sound ? 'sound-on' : 'sound-off'} size={20} />
+  </button>
 </header>
 
 <style>
@@ -37,4 +53,6 @@
   }
   .dot.done { background: var(--muted); }
   .dot.active { width: 28px; background: var(--primary); }
+  .sound { color: var(--muted); }
+  .sound.on { color: var(--primary); }
 </style>

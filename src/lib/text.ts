@@ -27,6 +27,7 @@ export function fill(text: string, theme: Theme, config?: GameConfig): string {
       case 'crews': return theme.terms.crews;
       case 'night': return theme.terms.night;
       case 'meeting': return theme.terms.meeting;
+      case 'lovers': return theme.lovers.name;
       case 'cooldown': return String(config?.killCooldown ?? 45);
       case 'countdown': return String(config?.deathCountdown ?? 10);
       case 'role': return arg && config ? roleName(arg, theme, config) : m;

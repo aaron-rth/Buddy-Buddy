@@ -16,6 +16,10 @@
   import BalanceBar from '../components/BalanceBar.svelte';
   import Sheet from '../components/Sheet.svelte';
   import Confirm from '../components/Confirm.svelte';
+  import Icon from '../icons/Icon.svelte';
+  import Emblem from '../icons/Emblem.svelte';
+  import { LOVERS_MIN } from '../../core/balance';
+  import { playStart } from '../../lib/sound';
   let { theme }: { theme: Theme } = $props();
 
   const cfg = store.config;
@@ -97,6 +101,7 @@
     confirmRedeal = false;
     try {
       store.game = distribute($state.snapshot(cfg) as GameConfig);
+      if (store.prefs.sound) playStart(theme);
       go('deal');
     } catch (e) {
       dealError = (e as Error).message;
@@ -111,6 +116,11 @@
   ];
   const specialChanceOpts = [
     { value: 0, label: 'Sicher' },
+    { value: 0.5, label: '50 %' },
+    { value: 0.25, label: '25 %' },
+  ];
+  const loverChanceOpts = [
+    { value: 1, label: 'Sicher' },
     { value: 0.5, label: '50 %' },
     { value: 0.25, label: '25 %' },
   ];
@@ -135,7 +145,7 @@
       {#if n >= 4}<BalanceBar {a} {theme} />{/if}
       {#each issues as i}
         <p class="issue" class:issue-error={i.level === 'error'} class:issue-warn={i.level === 'warn'}>
-          <span>{i.level === 'error' ? '⛔' : '⚠️'}</span>
+          <Icon name={i.level === 'error' ? 'error' : 'warning'} size={18} />
           <span>{fill(i.text, theme, cfg)}</span>
         </p>
       {/each}
@@ -147,7 +157,7 @@
     <!-- Imposter -->
     <section class="panel">
       <div class="panel-title">
-        <span class="ico">{themedRole('imposter', theme, cfg).icon}</span>
+        <Emblem icon={themedRole('imposter', theme, cfg).icon} size="sm" />
         {theme.terms.imposters}
         <span class="chip" class:chip-warn={!cfg.autoImposters && (imp.count !== a.recommended || imp.extraChance !== recChance)}>
           Empfohlen: {a.recommended}{recChance ? ` + ${pct(recChance)}` : ''}
@@ -169,14 +179,14 @@
           onclick={() => {
             cfg.autoImposters = true;
             applyAutoImposters(cfg);
-          }}>↺ Empfehlung übernehmen</button
+          }}><Icon name="refresh" size={18} /> Empfehlung übernehmen</button
         >
       {/if}
     </section>
 
     <!-- Sonderrollen -->
     <section class="panel">
-      <div class="panel-title"><span class="ico">⭐</span> Sonderrollen</div>
+      <div class="panel-title"><Emblem icon="star" size="sm" /> Sonderrollen</div>
       <div class="roles">
         {#each [...SPECIAL_ROLE_IDS, ...cfg.customRoles.map((c) => c.id)] as id (id)}
           {@const s = settingOf(id)}
@@ -185,7 +195,7 @@
           {#if s && def}
             <div class="role" class:on={s.enabled}>
               <Toggle checked={s.enabled} label={r.name} hint={r.short} onchange={(v) => toggleRole(s, v)}>
-                <span class="ico big">{r.icon}</span>
+                <Emblem icon={r.icon} />
               </Toggle>
               <div class="meta">
                 {#if def.custom}
@@ -206,13 +216,31 @@
             </div>
           {/if}
         {/each}
+        <!-- Verliebtes Paar -->
+        <div class="role" class:on={cfg.lovers.enabled}>
+          <Toggle bind:checked={cfg.lovers.enabled} label={theme.lovers.name} hint="Zwei Spieler sind ein Paar und kennen sich. Stirbt einer, stirbt der andere mit.">
+            <Emblem icon={theme.lovers.icon} />
+          </Toggle>
+          <div class="meta"><span class="chip" class:chip-warn={n < LOVERS_MIN}>ab {LOVERS_MIN} Spielern</span></div>
+          {#if cfg.lovers.enabled}
+            <div class="opts">
+              <Segmented bind:value={cfg.lovers.chance} options={loverChanceOpts} label="Wahrscheinlichkeit" />
+              <Toggle
+                checked={!cfg.lovers.anyone}
+                label="Nur gute Spieler"
+                hint={cfg.lovers.anyone ? `Kann jeden treffen – auch ${theme.terms.imposters}.` : `Nie ${theme.terms.imposters}, Komplizen oder Narren.`}
+                onchange={(v) => (cfg.lovers.anyone = !v)}
+              />
+            </div>
+          {/if}
+        </div>
       </div>
-      <button class="btn add-role" onclick={newRole}>＋ Eigene Rolle</button>
+      <button class="btn add-role" onclick={newRole}><Icon name="plus" size={20} /> Eigene Rolle</button>
     </section>
 
     <!-- Zeiten -->
     <section class="panel">
-      <div class="panel-title"><span class="ico">⏱️</span> Zeiten</div>
+      <div class="panel-title"><Emblem icon="timer" size="sm" /> Zeiten</div>
       <Segmented
         value={cfg.house === 'custom' ? null : cfg.house}
         options={(Object.keys(HOUSE_PRESETS) as HouseSize[]).map((k) => ({ value: k, label: HOUSE_PRESETS[k].label }))}
@@ -223,14 +251,16 @@
         <NumberStepper bind:value={cfg.killCooldown} min={10} max={180} step={5} unit="s" label="Kill-Cooldown" onchange={() => (cfg.house = 'custom')} />
         <NumberStepper bind:value={cfg.deathCountdown} min={3} max={30} unit="s" label="Countdown Opfer" onchange={() => (cfg.house = 'custom')} />
         <NumberStepper bind:value={cfg.discussionMinutes} min={1} max={10} unit="min" label="Diskussion" />
+        <NumberStepper bind:value={cfg.emergencyMeetings} min={0} max={3} label="Notfälle pro Spiel" />
+        {#if cfg.emergencyMeetings > 0}<p class="callhint muted"><Icon name="bell" size={16} /> Ruf: „{theme.terms.emergencyCall}“</p>{/if}
       </div>
     </section>
 
     <!-- Weitere Regeln -->
     <section class="panel">
       <button class="more" onclick={() => (more = !more)} aria-expanded={more}>
-        <span class="panel-title flat"><span class="ico">⚙️</span> Weitere Regeln</span>
-        <span class="chev" class:open={more}>⌄</span>
+        <span class="panel-title flat"><Emblem icon="sliders" size="sm" /> Weitere Regeln</span>
+        <span class="chev" class:open={more}><Icon name="chevron-down" /></span>
       </button>
       {#if more}
         <div class="toggles">
@@ -239,7 +269,6 @@
             <Toggle bind:checked={cfg.noDoubleKill} label="Kein Doppelkill" hint="Wer einen Kill sieht, wartet den Cooldown mit ab." />
           {/if}
           <Toggle bind:checked={cfg.cooldownOnNightStart} label="Cooldown zu Beginn jeder {theme.terms.night}" hint="Alle können sich erst verteilen." />
-          <Toggle bind:checked={cfg.emergencyMeeting} label="Notfall-{theme.terms.meeting}" hint="Jeder darf einmal ohne Leiche einberufen." />
           <Toggle bind:checked={cfg.revealOnVoteOut} label="Rolle bei Abwahl verraten" hint="Einfacher für die Crew." />
           <Toggle
             checked={cfg.countDisplay === 'exact'}
@@ -250,10 +279,10 @@
         </div>
       {/if}
     </section>
-    {#if dealError}<p class="issue issue-error">⛔ {fill(dealError, theme, cfg)}</p>{/if}
+    {#if dealError}<p class="issue issue-error"><Icon name="error" size={18} /> {fill(dealError, theme, cfg)}</p>{/if}
   </div>
   <div class="footer">
-    <button class="btn btn-primary" disabled={a.blocked} onclick={deal}>🎲 Rollen verteilen</button>
+    <button class="btn btn-primary" disabled={a.blocked} onclick={deal}><Icon name="dice" /> Rollen verteilen</button>
   </div>
 </main>
 
@@ -279,22 +308,21 @@
   .panel-title { margin-bottom: 0; flex-wrap: wrap; }
   .panel-title .chip { margin-left: auto; }
   .flat { margin: 0; }
-  .ico { font-size: 1.3rem; }
-  .ico.big { font-size: 1.7rem; width: 34px; text-align: center; }
+  .callhint { display: flex; align-items: center; gap: 6px; font-size: 0.9rem; }
   .sub { display: flex; flex-direction: column; gap: 6px; }
   .dist { display: flex; gap: 6px; flex-wrap: wrap; }
   .reset { align-self: flex-start; padding: 0; }
   .roles { display: flex; flex-direction: column; }
   .role { padding: 6px 0 10px; border-bottom: 1px solid var(--border); }
   .role:last-child { border-bottom: none; }
-  .meta { display: flex; gap: 6px; align-items: center; padding-left: 46px; }
+  .meta { display: flex; gap: 6px; align-items: center; padding-left: 54px; }
   .meta .btn-small { padding: 0 6px; min-height: 28px; }
-  .opts { display: flex; flex-direction: column; gap: 10px; padding: 10px 0 0 46px; }
+  .opts { display: flex; flex-direction: column; gap: 10px; padding: 10px 0 0 54px; }
   .role:not(.on) :global(.h) { opacity: 0.7; }
   .add-role { min-height: 48px; border-style: dashed; }
   .times { display: flex; flex-direction: column; gap: 10px; }
   .more { display: flex; justify-content: space-between; align-items: center; background: none; border: none; padding: 0; width: 100%; }
-  .chev { font-size: 1.4rem; transition: transform 0.2s; color: var(--muted); }
+  .chev { display: grid; transition: transform 0.2s; color: var(--muted); }
   .chev.open { transform: rotate(180deg); }
   .toggles { display: flex; flex-direction: column; }
 </style>

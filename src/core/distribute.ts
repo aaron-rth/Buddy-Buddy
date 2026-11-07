@@ -58,6 +58,23 @@ export function distribute(config: GameConfig, rng: Rng = cryptoRng): Game {
     }
   }
 
+  // Verliebtes Paar (zusätzlich zur Rolle)
+  const L = config.lovers;
+  if (L?.enabled && rng() < L.chance) {
+    const pool = assignments.filter((x) => defs[x.roleId].team !== 'neutral' && (L.anyone || defs[x.roleId].team === 'crew'));
+    if (pool.length >= 2) {
+      const i = randomInt(pool.length, rng);
+      let j = randomInt(pool.length - 1, rng);
+      if (j >= i) j++;
+      const p = pool[i];
+      const q = pool[j];
+      const evil = (x: Assignment) => defs[x.roleId].team === 'imposter';
+      const mixed = evil(p) !== evil(q);
+      p.lover = { partner: q.name, mixed };
+      q.lover = { partner: p.name, mixed };
+    }
+  }
+
   // 5. Kontrolle
   if (assignments.length !== n || new Set(assignments.map((x) => x.playerId)).size !== n)
     throw new DistributionError('Interner Fehler bei der Verteilung.');

@@ -5,3 +5,5 @@
   letter-spacing: 0.1em;
 }
 [data-theme='maulwurf'] .display { text-transform: uppercase; letter-spacing: 0.04em; }
+[data-theme='maulwurf'] { --emblem-radius: 4px; }
+[data-theme='maulwurf'] { --name-k: 13rem; }

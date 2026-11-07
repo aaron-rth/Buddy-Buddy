@@ -7,6 +7,8 @@
   import HoldButton from '../components/HoldButton.svelte';
   import Confirm from '../components/Confirm.svelte';
   import RevealCard from '../reveal/RevealCard.svelte';
+  import Icon from '../icons/Icon.svelte';
+  import { flip } from 'svelte/animate';
   let { theme }: { theme: Theme } = $props();
 
   type Phase = 'list' | 'handover' | 'reveal' | 'hidden';
@@ -20,6 +22,17 @@
   const seenCount = $derived(game.assignments.filter((a) => a.seen).length);
   const total = $derived(game.assignments.length);
   const allSeen = $derived(seenCount === total);
+  // Ungeöffnete oben, geöffnete rutschen nach unten
+  // justSeen bleibt kurz an alter Stelle, damit man das Nach-unten-Rutschen sieht
+  let justSeen = $state<string | null>(null);
+  const isDone = (a: { seen: boolean; playerId: string }) => Number(a.seen && a.playerId !== justSeen);
+  const ordered = $derived([...game.assignments].sort((x, y) => isDone(x) - isDone(y)));
+  $effect(() => {
+    if (phase === 'list' && justSeen) {
+      const t = setTimeout(() => (justSeen = null), 350);
+      return () => clearTimeout(t);
+    }
+  });
   const current = $derived(game.assignments.find((a) => a.playerId === currentId));
 
   function pick(id: string, isAgain = false) {
@@ -32,6 +45,7 @@
     phase = 'hidden';
   }
   function next() {
+    justSeen = currentId;
     currentId = null;
     phase = 'list';
   }
@@ -67,17 +81,17 @@
       </div>
       <span class="label">{seenCount} / {total} kennen ihre Rolle</span>
       <ul class="names">
-        {#each game.assignments as a (a.playerId)}
-          <li>
+        {#each ordered as a (a.playerId)}
+          <li animate:flip={{ duration: 450 }}>
             {#if a.seen}
               <HoldButton class="tile done" duration={1500} onconfirm={() => pick(a.playerId, true)} label="{a.name}: nochmal ansehen, gedrückt halten">
                 <span class="tname">{a.name}</span>
-                <span class="tag">✓ · halten = nochmal</span>
+                <span class="tag"><Icon name="check" size={16} /> halten = nochmal</span>
               </HoldButton>
             {:else}
               <button class="tile" onclick={() => pick(a.playerId)}>
                 <span class="tname">{a.name}</span>
-                <span class="arrow">→</span>
+                <span class="arrow"><Icon name="next" /></span>
               </button>
             {/if}
           </li>
@@ -86,7 +100,7 @@
     </div>
     {#if allSeen}
       <div class="footer">
-        <button class="btn btn-primary" onclick={() => go('ready')}>📜 Regeln vorlesen</button>
+        <button class="btn btn-primary" onclick={() => go('ready')}><Icon name="rules" /> Regeln vorlesen</button>
       </div>
     {/if}
   </main>
@@ -114,6 +128,7 @@
         {theme}
         role={themedRole(current.roleId, theme, game.config)}
         info={current.info}
+        lover={current.lover}
         onseen={() => {
           seenNow = true;
           current.seen = true;
@@ -128,7 +143,7 @@
 {:else if phase === 'hidden'}
   <main class="screen center">
     <div class="content mid">
-      <span class="ok">✓</span>
+      <span class="ok"><Icon name="check" size={44} /></span>
       <h1 class="display title">Rolle verdeckt</h1>
       <p class="muted">{allSeen ? 'Alle kennen ihre Rolle.' : 'Gib das Handy an die nächste Person.'}</p>
     </div>
@@ -176,8 +191,8 @@
   .names :global(.tile .inner) { width: 100%; justify-content: space-between; }
   .names :global(.tile.done) { opacity: 0.5; }
   .tname { font-size: 1.3rem; font-weight: 700; }
-  .arrow { font-size: 1.3rem; color: var(--primary); }
-  .tag { font-size: 0.8rem; color: var(--muted); }
+  .arrow { display: grid; color: var(--primary); }
+  .tag { display: flex; align-items: center; gap: 4px; font-size: 0.8rem; color: var(--muted); }
   .hand-name { font-size: clamp(2.6rem, 14vw, 4.4rem); word-break: break-word; }
   .warnbox { color: var(--warn); font-weight: 700; padding: 10px 14px; border: 1px solid var(--warn); border-radius: var(--radius); }
   .hint { min-height: 1.4em; }

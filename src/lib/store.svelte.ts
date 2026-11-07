@@ -1,4 +1,4 @@
-import type { Game, GameConfig } from '../core/types';
+import type { Game, GameConfig, Group, PlayerStats } from '../core/types';
 import { normalizeConfig } from '../core/defaults';
 
 /**
@@ -9,19 +9,30 @@ const KEY = 'buddy-buddy:v1';
 interface Saved {
   config: GameConfig;
   game: Game | null;
+  groups: Group[];
+  /** Statistik je Spielername */
+  stats: Record<string, PlayerStats>;
+  prefs: { sound: boolean };
 }
 
 function load(): Saved {
+  const empty: Saved = { config: normalizeConfig(undefined), game: null, groups: [], stats: {}, prefs: { sound: false } };
   try {
     const raw = localStorage.getItem(KEY);
     if (raw) {
-      const data = JSON.parse(raw) as Partial<Saved>;
-      return { config: normalizeConfig(data.config), game: data.game ?? null };
+      const d = JSON.parse(raw) as Partial<Saved>;
+      return {
+        config: normalizeConfig(d.config),
+        game: d.game ?? null,
+        groups: Array.isArray(d.groups) ? d.groups : [],
+        stats: d.stats && typeof d.stats === 'object' ? d.stats : {},
+        prefs: { ...empty.prefs, ...(d.prefs ?? {}) },
+      };
     }
   } catch {
     /* privater Modus o. Ä. */
   }
-  return { config: normalizeConfig(undefined), game: null };
+  return empty;
 }
 
 export const store: Saved = $state(load());

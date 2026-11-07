@@ -9,6 +9,8 @@ export interface Issue {
   overridable?: boolean;
 }
 
+export const LOVERS_MIN = 8;
+
 export interface Outcome {
   counts: Record<string, number>;
   p: number;
@@ -122,6 +124,8 @@ export function analyze(config: GameConfig): Analysis {
       if (s.roleId !== 'imposter' && n < d.minPlayers)
         warnings.push({ level: 'warn', text: `{role:${d.id}} ist erst ab ${d.minPlayers} Spielern sinnvoll.` });
     }
+    if (config.lovers?.enabled && n < LOVERS_MIN)
+      warnings.push({ level: 'warn', text: `{lovers}: erst ab ${LOVERS_MIN} Spielern sinnvoll.` });
     const maxSpecials = Math.max(
       ...outs.map((o) => sumCounts(o.counts) - (o.counts['imposter'] ?? 0)),
     );

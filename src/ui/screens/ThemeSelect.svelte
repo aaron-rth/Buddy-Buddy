@@ -3,6 +3,7 @@
   import { go } from '../../lib/router.svelte';
   import { THEMES } from '../../themes';
   import Header from '../components/Header.svelte';
+  import Icon from '../icons/Icon.svelte';
 </script>
 
 <main class="screen">
@@ -24,11 +25,11 @@
         >
           <span class="scene" aria-hidden="true"><t.Scene /></span>
           <span class="shade" aria-hidden="true"></span>
-          {#if sel}<span class="check" aria-hidden="true">✓</span>{/if}
+          {#if sel}<span class="check" aria-hidden="true"><Icon name="check" size={18} /></span>{/if}
           <span class="info">
             <span class="genre">{t.genre}</span>
             <span class="name">{t.name}</span>
-            <span class="vs">{t.roles.imposter?.icon} {t.terms.imposters}</span>
+            <span class="vs"><Icon name={t.roles.imposter?.icon ?? 'dagger'} size={15} /> {t.terms.imposters}</span>
           </span>
         </button>
       {/each}
@@ -73,5 +74,6 @@
   .info { position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; flex-direction: column; gap: 2px; }
   .genre { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.14em; color: var(--t-muted); font-weight: 600; }
   .name { font-family: var(--t-font); font-size: 1.35rem; font-weight: 800; line-height: 1.1; color: var(--t-text); }
-  .vs { font-size: 0.8rem; color: var(--t-muted); }
+  .vs { font-size: 0.8rem; color: var(--t-muted); display: flex; align-items: center; gap: 5px; }
+  .check :global(svg) { stroke-width: 2.4; }
 </style>

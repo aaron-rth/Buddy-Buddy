@@ -1,5 +1,6 @@
 <script lang="ts">
   import type { Snippet } from 'svelte';
+  import Icon from '../icons/Icon.svelte';
   let { open, onclose, title, children }: { open: boolean; onclose: () => void; title: string; children: Snippet } = $props();
 </script>
 
@@ -9,7 +10,7 @@
     <div class="grip"></div>
     <div class="head">
       <h2 class="display">{title}</h2>
-      <button class="icon-btn" onclick={onclose} aria-label="Schließen">✕</button>
+      <button class="icon-btn" onclick={onclose} aria-label="Schließen"><Icon name="close" /></button>
     </div>
     <div class="body">{@render children()}</div>
   </div>
