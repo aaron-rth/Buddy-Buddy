@@ -40,9 +40,8 @@ In kleinen Räumen findet ein Imposter schnell Opfer, deshalb ist der Cooldown d
 
 **Entscheidung:** Imposter **können sich nicht gegenseitig töten**. Standardmäßig **kennen sie sich nicht**.
 
-- Tippt ein Imposter einen anderen an, stirbt niemand. Der Angetippte tippt 2× zurück. Beide wissen dann voneinander, und der Cooldown ist trotzdem verbraucht.
-- So kann ein Imposter einen anderen nur durch einen fehlgeschlagenen Kill erkennen. Das ist gewollt: Zusammenarbeit entsteht erst im Lauf des Spiels und kostet etwas. Am Anfang gibt es keine Doppelkills von Teams, die sich schon kennen.
-- **Kein Doppelkill (Standard an):** Bekommt ein Imposter einen Kill direkt neben sich mit, wartet er dessen Cooldown mit ab. Damit wird auch das „Nebeneinander-Laufen mit Doppelkill“ verhindert.
+- Wird ein Imposter angetippt, passiert **nichts**: Er stirbt nicht und gibt auch kein Zeichen. Der Angreifer erfährt es nicht direkt, sondern höchstens indirekt (z. B. weil die Person später noch lebt). Sein Cooldown ist trotzdem verbraucht.
+- **Kein Doppelkill (Standard an):** Sieht ein Imposter, wie jemand tötet, muss er ebenfalls den Cooldown abwarten. Damit wird das „Nebeneinander-Laufen mit Doppelkill“ verhindert.
 - **Option „Imposter kennen sich“:** klassische Werwolf-Variante. Imposter sehen beim Aufdecken die Namen ihrer Partner.
 
 Gegenseitiges Töten wird **nicht** angeboten. Im Dunkeln erkennt man sein Opfer oft nicht, Team-Kills wären also fast immer Zufall. Bei 2 Impostern halbiert ein einziger Unfall das Team.

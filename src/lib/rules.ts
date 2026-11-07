@@ -61,9 +61,9 @@ export function buildRuleCard(game: Game, theme: Theme): { intro: string; sectio
     `Danach muss der Täter ${c.killCooldown} Sekunden warten.`,
   ];
   if (multi) {
-    kill.push(f('{imposters} sind gegeneinander immun: Wer angetippt wird, tippt 2× zurück. Beide wissen dann Bescheid – der Cooldown ist trotzdem verbraucht.'));
+    kill.push(f('{imposters} sind gegeneinander immun: Wird ein {imposter} angetippt, passiert nichts. Kein Zeichen, einfach weiterlaufen. Der Cooldown des Angreifers ist trotzdem verbraucht.'));
     kill.push(c.impostersKnow ? f('Die {imposters} kennen sich von Anfang an.') : f('Die {imposters} kennen sich am Anfang nicht.'));
-    if (c.noDoubleKill) kill.push(f(`Kein Doppelkill: Tötet ein {imposter} direkt neben dir, wartest du ebenfalls ${c.killCooldown} Sekunden.`));
+    if (c.noDoubleKill) kill.push(f(`Kein Doppelkill: Siehst du als {imposter}, wie jemand tötet, wartest du ebenfalls ${c.killCooldown} Sekunden.`));
   }
   sections.push({ icon: '🔪', title: 'Töten', items: kill });
 

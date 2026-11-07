@@ -235,8 +235,8 @@
       {#if more}
         <div class="toggles">
           {#if multi}
-            <Toggle bind:checked={cfg.impostersKnow} label="{theme.terms.imposters} kennen sich" hint="Sonst finden sie sich erst durch einen fehlgeschlagenen Kill." />
-            <Toggle bind:checked={cfg.noDoubleKill} label="Kein Doppelkill" hint="Wer einen Kill direkt mitbekommt, wartet den Cooldown mit ab." />
+            <Toggle bind:checked={cfg.impostersKnow} label="{theme.terms.imposters} kennen sich" hint="Sonst wissen sie nichts voneinander." />
+            <Toggle bind:checked={cfg.noDoubleKill} label="Kein Doppelkill" hint="Wer einen Kill sieht, wartet den Cooldown mit ab." />
           {/if}
           <Toggle bind:checked={cfg.cooldownOnNightStart} label="Cooldown zu Beginn jeder {theme.terms.night}" hint="Alle können sich erst verteilen." />
           <Toggle bind:checked={cfg.emergencyMeeting} label="Notfall-{theme.terms.meeting}" hint="Jeder darf einmal ohne Leiche einberufen." />
